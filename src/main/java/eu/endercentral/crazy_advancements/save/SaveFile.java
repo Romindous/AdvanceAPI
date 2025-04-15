@@ -30,12 +30,12 @@ public class SaveFile {
 	public SaveFile(List<ProgressData> progressData, List<CriteriaData> criteriaData) {
 		this.progressData = new HashMap<>();
 		for(ProgressData progress : progressData) {
-			this.progressData.put(progress.getName().toString(), progress);
+			this.progressData.put(progress.name().toString(), progress);
 		}
 		
 		this.criteriaData = new HashMap<>();
 		for(CriteriaData criteria : criteriaData) {
-			this.criteriaData.put(criteria.getName().toString(), criteria);
+			this.criteriaData.put(criteria.name().toString(), criteria);
 		}
 	}
 	
@@ -68,12 +68,12 @@ public class SaveFile {
 	public void merge(SaveFile saveFile) {
 		//Merge Progress Data
 		for(ProgressData progress : saveFile.getProgressData()) {
-			this.progressData.put(progress.getName().toString(), progress);
+			this.progressData.put(progress.name().toString(), progress);
 		}
 		
 		//Merge Criteria Data
 		for(CriteriaData criteria : saveFile.getCriteriaData()) {
-			this.criteriaData.put(criteria.getName().toString(), criteria);
+			this.criteriaData.put(criteria.name().toString(), criteria);
 		}
 	}
 	

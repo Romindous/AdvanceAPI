@@ -10,15 +10,9 @@ public class CustomItem {
 	private final int customModelData;
 	
 	public CustomItem(NameKey name, Material type, int customModelData) {
-		if(name == null) {
-			throw new RuntimeException("Custom Item Name may not be null");
-		}
-		if(type == null) {
-			throw new RuntimeException("Custom Item Type may not be null");
-		}
-		if(!type.isItem()) {
-			throw new RuntimeException("Can't create Custom Item from non-item Type '" + type.name().toLowerCase() + "'");
-		}
+		if (name == null) throw new RuntimeException("Custom Item Name may not be null");
+		if (type == null) throw new RuntimeException("Custom Item Type may not be null");
+		if (!type.isItem()) throw new RuntimeException("Can't create Custom Item from non-item Type '" + type.name().toLowerCase() + "'");
 		this.name = name;
 		this.type = type;
 		this.customModelData = customModelData;

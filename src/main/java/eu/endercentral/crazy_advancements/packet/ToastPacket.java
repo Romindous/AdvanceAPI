@@ -18,59 +18,54 @@ import net.minecraft.resources.ResourceLocation;
 
 /**
  * Represents an Advancements Packet for Toast Notifications
- * 
- * @author Axel
  *
+ * @author Axel
  */
-public class ToastPacket {
-	
-	private final Player player;
-	private final boolean add;
-	private final ToastNotification notification;
-	
+public record ToastPacket(Player player, boolean add, ToastNotification notification) {
+
 	/**
 	 * Constructor for creating Toast Packets
-	 * 
-	 * @param player The target Player
-	 * @param add Whether to add or remove the Advancement
+	 *
+	 * @param player       The target Player
+	 * @param add          Whether to add or remove the Advancement
 	 * @param notification The Notification
 	 */
-	public ToastPacket(Player player, boolean add, ToastNotification notification) {
-		this.player = player;
-		this.add = add;
-		this.notification = notification;
+	public ToastPacket {
 	}
-	
+
 	/**
 	 * Gets the target Player
-	 * 
+	 *
 	 * @return The target Player
 	 */
-	public Player getPlayer() {
+	@Override
+	public Player player() {
 		return player;
 	}
-	
+
 	/**
 	 * Gets whether the Advancement is added or removed
-	 * 
+	 *
 	 * @return Whether the Advancement is added or removed
 	 */
-	public boolean isAdd() {
+	@Override
+	public boolean add() {
 		return add;
 	}
-	
+
 	/**
 	 * Gets the Notification
-	 * 
+	 *
 	 * @return The Notification
 	 */
-	public ToastNotification getNotification() {
+	@Override
+	public ToastNotification notification() {
 		return notification;
 	}
-	
+
 	/**
 	 * Builds a packet that can be sent to a Player
-	 * 
+	 *
 	 * @return The Packet
 	 */
 	public ClientboundUpdateAdvancementsPacket build() {
@@ -78,30 +73,25 @@ public class ToastPacket {
 		List<AdvancementHolder> advancements = new ArrayList<>();
 		Set<ResourceLocation> removedAdvancements = new HashSet<>();
 		Map<ResourceLocation, AdvancementProgress> progress = new HashMap<>();
-		
+
 		//Populate Lists
-		if(add) {
-			advancements.add(new AdvancementHolder(ToastNotification.NOTIFICATION_NAME.getMinecraftKey(), PacketConverter.toNmsToastAdvancement(getNotification())));
+		if (add) {
+			advancements.add(new AdvancementHolder(ToastNotification.NOTIFICATION_NAME.getMinecraftKey(), PacketConverter.toNmsToastAdvancement(notification())));
 			progress.put(ToastNotification.NOTIFICATION_NAME.getMinecraftKey(), ToastNotification.NOTIFICATION_PROGRESS.getNmsProgress());
 		} else {
 			removedAdvancements.add(ToastNotification.NOTIFICATION_NAME.getMinecraftKey());
 		}
-		
-		//Create Packet
-		ClientboundUpdateAdvancementsPacket packet = new ClientboundUpdateAdvancementsPacket(false, advancements, removedAdvancements, progress);
-		return packet;
+
+        return new ClientboundUpdateAdvancementsPacket(false, advancements, removedAdvancements, progress, true);
 	}
-	
+
 	/**
 	 * Sends the Packet to the target Player
-	 * 
 	 */
 	public void send() {
 		ClientboundUpdateAdvancementsPacket packet = build();
-		((CraftPlayer) getPlayer()).getHandle().connection.send(packet);
+		((CraftPlayer) player()).getHandle().connection.send(packet);
 	}
-	
-	
-	
-	
+
+
 }

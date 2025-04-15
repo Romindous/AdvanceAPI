@@ -1,5 +1,10 @@
 package eu.endercentral.crazy_advancements.manager;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
@@ -24,12 +29,6 @@ import eu.endercentral.crazy_advancements.save.SaveFile;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
-
 /**
  * Represents a Manager that manages Players and Advancements
  * 
@@ -38,7 +37,7 @@ import java.util.*;
  */
 public final class AdvancementManager {
 	
-	private static HashMap<String, AdvancementManager> accessibleManagers = new HashMap<>();
+	private static final HashMap<String, AdvancementManager> accessibleManagers = new HashMap<>();
 	
 	/**
 	 * Gets an accessible Advancement Manager by it's Name
@@ -47,7 +46,7 @@ public final class AdvancementManager {
 	 * @return the Manager or null if no matching Manager is found
 	 */
 	public static AdvancementManager getAccessibleManager(NameKey name) {
-		return accessibleManagers.containsKey(name.toString()) ? accessibleManagers.get(name.toString()) : null;
+		return accessibleManagers.getOrDefault(name.toString(), null);
 	}
 	
 	/**
@@ -60,8 +59,8 @@ public final class AdvancementManager {
 	}
 	
 	private final NameKey name;
-	private ArrayList<Player> players;
-	private ArrayList<Advancement> advancements = new ArrayList<>();
+	private final ArrayList<Player> players;
+	private final ArrayList<Advancement> advancements = new ArrayList<>();
 	
 	/**
 	 * Constructor for creating Advancement Managers
@@ -140,13 +139,7 @@ public final class AdvancementManager {
 	 * @return All players that have been added to the manager
 	 */
 	public ArrayList<Player> getPlayers() {
-		Iterator<Player> it = players.iterator();
-		while(it.hasNext()) {
-			Player p = it.next();
-			if(p == null || !p.isOnline()) {
-				it.remove();
-			}
-		}
+        players.removeIf(p -> p == null || !p.isOnline());
 		return players;
 	}
 	
@@ -302,13 +295,7 @@ public final class AdvancementManager {
 	 */
 	public ArrayList<Advancement> getAdvancements(String namespace) {
 		ArrayList<Advancement> advs = getAdvancements();
-		Iterator<Advancement> it = advs.iterator();
-		while(it.hasNext()) {
-			Advancement adv = it.next();
-			if(!adv.getName().getNamespace().equalsIgnoreCase(namespace)) {
-				it.remove();
-			}
-		}
+        advs.removeIf(adv -> !adv.getName().getNamespace().equalsIgnoreCase(namespace));
 		return advs;
 	}
 	
@@ -468,8 +455,7 @@ public final class AdvancementManager {
 			return grantAdvancement(Bukkit.getPlayer(uuid), advancement);
 		} else {
 			AdvancementProgress progress = advancement.getProgress(uuid);
-			GenericResult result = progress.grant();
-			return result;
+            return progress.grant();
 		}
 	}
 	
@@ -506,8 +492,7 @@ public final class AdvancementManager {
 			return revokeAdvancement(Bukkit.getPlayer(uuid), advancement);
 		} else {
 			AdvancementProgress progress = advancement.getProgress(uuid);
-			GenericResult result = progress.revoke();
-			return result;
+            return progress.revoke();
 		}
 	}
 	
@@ -561,8 +546,7 @@ public final class AdvancementManager {
 			return grantCriteria(Bukkit.getPlayer(uuid), advancement, criteria);
 		} else {
 			AdvancementProgress progress = advancement.getProgress(uuid);
-			GrantCriteriaResult result = progress.grantCriteria(criteria);
-			return result;
+            return progress.grantCriteria(criteria);
 		}
 	}
 	
@@ -602,8 +586,7 @@ public final class AdvancementManager {
 			return revokeCriteria(Bukkit.getPlayer(uuid), advancement, criteria);
 		} else {
 			AdvancementProgress progress = advancement.getProgress(uuid);
-			GenericResult result = progress.revokeCriteria(criteria);
-			return result;
+            return progress.revokeCriteria(criteria);
 		}
 	}
 	
@@ -667,9 +650,8 @@ public final class AdvancementManager {
 		} else {
 			if(advancement.getCriteria().getType() == CriteriaType.NUMBER) {
 				AdvancementProgress progress = advancement.getProgress(uuid);
-				SetCriteriaResult result = progress.setCriteriaProgress(criteriaProgress);
-				
-				return result;
+
+                return progress.setCriteriaProgress(criteriaProgress);
 			}
 			return SetCriteriaResult.INVALID;
 		}
@@ -741,9 +723,8 @@ public final class AdvancementManager {
 				break;
 			}
 		}
-		SaveFile saveFile = new SaveFile(progressData, criteriaData);
-		
-		return saveFile;
+
+        return new SaveFile(progressData, criteriaData);
 	}
 	
 	/**
@@ -834,8 +815,8 @@ public final class AdvancementManager {
 		List<Advancement> advancementsList = advancements.length == 0 ? getAdvancements() : Arrays.asList(advancements);
 		
 		for(ProgressData progressData : saveFile.getProgressData()) {
-			NameKey name = progressData.getName();
-			int progress = progressData.getProgress();
+			NameKey name = progressData.name();
+			int progress = progressData.progress();
 			
 			for(Advancement advancement: advancementsList) {
 				if(advancement.getCriteria().getType() == CriteriaType.NUMBER && advancement.hasName(name)) {
@@ -846,8 +827,8 @@ public final class AdvancementManager {
 		}
 		
 		for(CriteriaData progressData : saveFile.getCriteriaData()) {
-			NameKey name = progressData.getName();
-			Iterable<String> criteria = progressData.getCriteria();
+			NameKey name = progressData.name();
+			Iterable<String> criteria = progressData.criteria();
 			
 			for(Advancement advancement: advancementsList) {
 				if(advancement.getCriteria().getType() == CriteriaType.LIST && advancement.hasName(name)) {
@@ -950,9 +931,8 @@ public final class AdvancementManager {
 				
 				JsonElement element = JsonParser.parseReader(os);
 				os.close();
-				
-				SaveFile saveFile = SaveFile.fromJSON(element);
-				return saveFile;
+
+                return SaveFile.fromJSON(element);
 			} catch (Exception ex) {
 				if(os != null) {
 					try {

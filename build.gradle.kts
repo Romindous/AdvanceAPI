@@ -1,21 +1,26 @@
+import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
     id("java")
     id("maven-publish")
-    id("io.papermc.paperweight.userdev") version "1.7.7"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.16"
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
 }
 
 group = "eu.endercentral.crazy_advancements"
-version = "2.1.21"
+version = "2.21.5"
 
 repositories {
     mavenCentral()
+    maven {
+        name = "papermc"
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.5-no-moonrise-SNAPSHOT")
 }
 
 java {
@@ -23,13 +28,21 @@ java {
 }
 
 tasks {
+    build {
+        paperweight.reobfArtifactConfiguration = ReobfArtifactConfiguration.MOJANG_PRODUCTION
+    }
+
     compileJava {
         options.encoding = Charsets.UTF_8.name()
         options.release.set(21)
         dependsOn(clean)
     }
 
-    jar.get().archiveFileName = "${name}-${version}-mojmap.jar"
+    jar {
+        //from(zipTree("libs/jedis-4.3.1.zip"))
+        destinationDirectory.set(layout.buildDirectory)
+        archiveFileName = "${project.name}-${version}.jar"
+    }
 }
 
 publishing {
@@ -44,7 +57,7 @@ publishing {
 bukkit {
     main = "eu.endercentral.crazy_advancements.CrazyAdvancementsAPI"
     author = "ZockerAxel"
-    apiVersion = "1.20.5" // Should be always same as dev bundle version
+    apiVersion = "1.21.5" // Should be always same as dev bundle version
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
 
     commands {

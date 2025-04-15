@@ -103,8 +103,7 @@ public class AdvancementsPacket {
 		}
 		
 		//Create Packet
-		ClientboundUpdateAdvancementsPacket packet = new ClientboundUpdateAdvancementsPacket(isReset(), advancements, removedAdvancements, progress);
-		return packet;
+        return new ClientboundUpdateAdvancementsPacket(isReset(), advancements, removedAdvancements, progress, true);
 	}
 	
 	protected net.minecraft.advancements.Advancement convertAdvancement(Advancement advancement) {

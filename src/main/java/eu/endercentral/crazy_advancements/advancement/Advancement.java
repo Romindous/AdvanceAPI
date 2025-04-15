@@ -5,13 +5,13 @@ import eu.endercentral.crazy_advancements.advancement.AdvancementDisplay.Advance
 import eu.endercentral.crazy_advancements.advancement.criteria.Criteria;
 import eu.endercentral.crazy_advancements.advancement.progress.AdvancementProgress;
 import eu.endercentral.crazy_advancements.manager.AdvancementManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.TranslatableComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -33,13 +33,13 @@ public class Advancement {
 	private AdvancementReward reward;
 	
 	private final Advancement parent;
-	private HashSet<Advancement> children = new HashSet<>();
+	private final HashSet<Advancement> children = new HashSet<>();
 	private final boolean childrenTracked;
 	
 	private final List<AdvancementFlag> flags;
 	private HashMap<String, Boolean> savedVisibilityStatus;
 	
-	private HashMap<String, AdvancementProgress> progressMap = new HashMap<>();
+	private final HashMap<String, AdvancementProgress> progressMap = new HashMap<>();
 	
 	/**
 	 * Constructor for Advancements with a parent
@@ -436,7 +436,7 @@ public class Advancement {
 	 * Unloads the Visibility Status for a Player<br>
 	 * Should only be run after somebody disconnects to free up RAM
 	 * 
-	 * @param player The UUID of Player to Unload Visibility
+	 * @param uuid The UUID of Player to Unload Visibility
 	 */
 	public void unloadVisibilityStatus(UUID uuid) {
 		savedVisibilityStatus.remove(uuid.toString());
@@ -448,8 +448,7 @@ public class Advancement {
 	 * @return The Toast Notification
 	 */
 	public ToastNotification getToastNotification() {
-		ToastNotification notification = new ToastNotification(getDisplay().getIcon(), getDisplay().getTitle(), getDisplay().getFrame());
-		return notification;
+        return new ToastNotification(getDisplay().getIcon(), getDisplay().title(), getDisplay().getFrame());
 	}
 	
 	/**
@@ -461,18 +460,33 @@ public class Advancement {
 		ToastNotification notification = getToastNotification();
 		notification.send(player);
 	}
-	
+
+	/**
+	 * Gets an Advancement Message
+	 *
+	 * @param player Player who has recieved the advancement
+	 * @return The Advancement Message as a Base Component
+	 */
+	public Component message(Player player) {
+        final TranslatableComponent message = Component.translatable("chat.type.advancement." + display.getFrame().name().toLowerCase());
+		final Component title = Component.text("[").append(display.title()).append(Component.text("]"))
+			.color(getDisplay().getFrame() == AdvancementFrame.CHALLENGE ? NamedTextColor.DARK_PURPLE : NamedTextColor.GREEN)
+			.hoverEvent(HoverEvent.showText(display.title().appendNewline().append(display.description())));
+		return player.displayName().append(message).append(title);
+	}
+
 	/**
 	 * Gets an Advancement Message
 	 * 
 	 * @param player Player who has recieved the advancement
 	 * @return The Advancement Message as a Base Component
 	 */
+	@Deprecated
 	public BaseComponent getMessage(Player player) {
 		String translation = "chat.type.advancement." + display.getFrame().name().toLowerCase();
 		boolean challenge = getDisplay().getFrame() == AdvancementFrame.CHALLENGE;
 		
-		TranslatableComponent message = new TranslatableComponent();
+		net.md_5.bungee.api.chat.TranslatableComponent message = new net.md_5.bungee.api.chat.TranslatableComponent();
 		message.setTranslate(translation);
 		
 		TextComponent playerNameText = new TextComponent();
@@ -480,16 +494,17 @@ public class Advancement {
 		playerNameText.setExtra(Arrays.asList(playerNameComponents));
 		
 		TextComponent title = new TextComponent("[");
-		title.addExtra(display.getTitle().getJson());
+		title.addExtra(display.getTitle().json());
 		title.addExtra("]");
 		title.setColor(challenge ? ChatColor.DARK_PURPLE : ChatColor.GREEN);
 		
-		TextComponent titleTextComponent = new TextComponent(display.getTitle().getJson());
+		TextComponent titleTextComponent = new TextComponent(display.getTitle().json());
 		titleTextComponent.setColor(title.getColor());
 		
 		Text titleText = new Text(new BaseComponent[] {titleTextComponent});
-		Text descriptionText = new Text(new BaseComponent[] {display.getDescription().getJson()});
-		title.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, titleText, new Text("\n"), descriptionText));
+		Text descriptionText = new Text(new BaseComponent[] {display.getDescription().json()});
+		title.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action
+			.SHOW_TEXT, titleText, new Text("\n"), descriptionText));
 		
 		message.setWith(Arrays.asList(playerNameText, title));
 		
@@ -500,20 +515,18 @@ public class Advancement {
 	 * Displays an Advancement Message to every Player saying Player has completed said advancement<br>
 	 * Note that this doesn't grant the advancement
 	 * 
-	 * 
 	 * @param player Player who has recieved the advancement
 	 */
 	public void displayMessageToEverybody(Player player) {
-		BaseComponent message = getMessage(player);
-		
-		for(Player online : Bukkit.getOnlinePlayers()) {
-			online.spigot().sendMessage(ChatMessageType.CHAT, message);
+		final Component msg = message(player);
+		for(final Player online : Bukkit.getOnlinePlayers()) {
+			online.sendMessage(msg);
 		}
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		return getName().equals(((Advancement) obj).getName());
+		return obj instanceof final Advancement adv && getName().equals(adv.getName());
 	}
 	
 	

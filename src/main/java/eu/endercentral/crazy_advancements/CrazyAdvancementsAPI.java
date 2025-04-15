@@ -1,17 +1,28 @@
 package eu.endercentral.crazy_advancements;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-
-import javax.annotation.Nullable;
-
+import java.util.*;
+import com.google.gson.*;
+import eu.endercentral.crazy_advancements.advancement.*;
+import eu.endercentral.crazy_advancements.advancement.AdvancementDisplay.AdvancementFrame;
+import eu.endercentral.crazy_advancements.advancement.criteria.CriteriaType;
+import eu.endercentral.crazy_advancements.advancement.progress.GenericResult;
+import eu.endercentral.crazy_advancements.advancement.progress.GrantCriteriaResult;
+import eu.endercentral.crazy_advancements.advancement.serialized.SerializedAdvancement;
+import eu.endercentral.crazy_advancements.advancement.serialized.SerializedAdvancementDisplay;
+import eu.endercentral.crazy_advancements.command.ProgressChangeOperation;
+import eu.endercentral.crazy_advancements.item.CustomItem;
+import eu.endercentral.crazy_advancements.item.SerializedCustomItem;
+import eu.endercentral.crazy_advancements.manager.AdvancementManager;
+import eu.endercentral.crazy_advancements.packet.AdvancementsPacket;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.minecraft.advancements.Criterion;
+import net.minecraft.advancements.critereon.ImpossibleTrigger;
+import net.minecraft.network.protocol.game.ClientboundSelectAdvancementsTabPacket;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -30,32 +41,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-
-import eu.endercentral.crazy_advancements.advancement.Advancement;
-import eu.endercentral.crazy_advancements.advancement.AdvancementDisplay;
-import eu.endercentral.crazy_advancements.advancement.AdvancementDisplay.AdvancementFrame;
-import eu.endercentral.crazy_advancements.advancement.AdvancementFlag;
-import eu.endercentral.crazy_advancements.advancement.AdvancementVisibility;
-import eu.endercentral.crazy_advancements.advancement.ToastNotification;
-import eu.endercentral.crazy_advancements.advancement.criteria.CriteriaType;
-import eu.endercentral.crazy_advancements.advancement.progress.GenericResult;
-import eu.endercentral.crazy_advancements.advancement.progress.GrantCriteriaResult;
-import eu.endercentral.crazy_advancements.advancement.serialized.SerializedAdvancement;
-import eu.endercentral.crazy_advancements.advancement.serialized.SerializedAdvancementDisplay;
-import eu.endercentral.crazy_advancements.command.ProgressChangeOperation;
-import eu.endercentral.crazy_advancements.item.CustomItem;
-import eu.endercentral.crazy_advancements.item.SerializedCustomItem;
-import eu.endercentral.crazy_advancements.manager.AdvancementManager;
-import eu.endercentral.crazy_advancements.packet.AdvancementsPacket;
-import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.critereon.ImpossibleTrigger;
-import net.minecraft.network.protocol.game.ClientboundSelectAdvancementsTabPacket;
-
 /**
  * Represents the API's Plugin
  * 
@@ -66,23 +51,19 @@ public class CrazyAdvancementsAPI extends JavaPlugin implements Listener {
 	
 	public static final String API_NAMESPACE = "crazy_advancements";
 	
-	private static final Gson gson;
+	private static final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 	private static final List<String> SELECTORS = Arrays.asList("@a", "@p", "@s", "@r");
-	private static CrazyAdvancementsAPI instance;
-	
-	static {
-		gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-	}
+	public static final MiniMessage msg = MiniMessage.miniMessage();
 	
 	/**
 	 * Criterion Instance for Internal Use
 	 */
 	public static final Criterion<?> CRITERION = new Criterion<>(new ImpossibleTrigger(), new ImpossibleTrigger.TriggerInstance());
-	
-	
-	
+
+
+	private static CrazyAdvancementsAPI instance;
 	private static AdvancementPacketReceiver packetReciever;
-	private static HashMap<String, NameKey> activeTabs = new HashMap<>();
+	private static final HashMap<String, NameKey> activeTabs = new HashMap<>();
 	
 	private final List<CustomItem> customItems = new ArrayList<>();
 	private AdvancementManager fileAdvancementManager;
@@ -207,8 +188,8 @@ public class CrazyAdvancementsAPI extends JavaPlugin implements Listener {
 					
 					//Generate Display
 					ItemStack icon = getItemStack(serializedAdvancementDisplay.getIcon());
-					JSONMessage title = new JSONMessage(serializedAdvancementDisplay.getTitle().deserialize());
-					JSONMessage description = new JSONMessage(serializedAdvancementDisplay.getDescription().deserialize());
+					Component title = serializedAdvancementDisplay.getTitle().deserial();
+					Component description = serializedAdvancementDisplay.getDescription().deserial();
 					AdvancementFrame frame = AdvancementFrame.parse(serializedAdvancementDisplay.getFrame());
 					AdvancementVisibility visibility = AdvancementVisibility.parseVisibility(serializedAdvancementDisplay.getVisibility());
 					
@@ -337,13 +318,7 @@ public class CrazyAdvancementsAPI extends JavaPlugin implements Listener {
 		
 		//Add Player to File Advancement Manager
 		fileAdvancementManager.loadProgress(player);
-		Bukkit.getScheduler().runTaskLater(this, new Runnable() {
-			
-			@Override
-			public void run() {
-				fileAdvancementManager.addPlayer(player);
-			}
-		}, 2);
+		Bukkit.getScheduler().runTaskLater(this, () -> fileAdvancementManager.addPlayer(player), 2);
 	}
 	
 	@EventHandler
@@ -402,8 +377,8 @@ public class CrazyAdvancementsAPI extends JavaPlugin implements Listener {
 		return activeTabs.get(player.getUniqueId().toString());
 	}
 	
-	private final String noPermission = "§cI'm sorry but you do not have permission to perform this command. Please contact the server administrator if you believe that this is an error.";
-	private final String commandIncompatible = "§cThis Command is incompatible with your Arguments!";
+	private static final String noPermission = "§cI'm sorry but you do not have permission to perform this command. Please contact the server administrator if you believe that this is an error.";
+	private static final String commandIncompatible = "§cThis Command is incompatible with your Arguments!";
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -441,7 +416,7 @@ public class CrazyAdvancementsAPI extends JavaPlugin implements Listener {
 									toast.send(player);
 								}
 								
-								sender.sendMessage(players.size() == 1 ? "§aSuccessfully displayed Toast to §b" + players.get(0).getName() + "§a!" : "§aSuccessfully displayed Toast to §e" + players.size() + "§aPlayers!");
+								sender.sendMessage(players.size() == 1 ? "§aSuccessfully displayed Toast to §b" + players.getFirst().getName() + "§a!" : "§aSuccessfully displayed Toast to §e" + players.size() + "§aPlayers!");
 							} else {
 								sender.sendMessage("§c'" + args[1] + "' isn't a valid Item Material");
 							}
@@ -833,7 +808,7 @@ public class CrazyAdvancementsAPI extends JavaPlugin implements Listener {
 		}
 		return null;
 	}
-	
+
 	private ItemStack getItemStack(String input, CommandSender... commandSender) {
 		int colonIndex = input.indexOf(':');
 		String materialName = colonIndex == -1 ? input : input.substring(0, colonIndex);
@@ -849,8 +824,7 @@ public class CrazyAdvancementsAPI extends JavaPlugin implements Listener {
 			} else {
 				material = customItem.getType();
 				stack = new ItemStack(material);
-				ItemMeta meta = stack.getItemMeta();
-				meta.setCustomModelData(customItem.getCustomModelData());
+				ItemMeta meta = model(stack, customItem);
 				stack.setItemMeta(meta);
 			}
 		} else {
@@ -871,7 +845,7 @@ public class CrazyAdvancementsAPI extends JavaPlugin implements Listener {
 							}
 							
 							if(players.size() > 0) {
-								Player player = players.get(0);
+								Player player = players.getFirst();
 								SkullMeta meta = (SkullMeta) stack.getItemMeta();
 								meta.setOwningPlayer(player);
 								stack.setItemMeta(meta);
@@ -898,5 +872,11 @@ public class CrazyAdvancementsAPI extends JavaPlugin implements Listener {
 			return stack;
 		}
 	}
-	
+
+	@Deprecated(forRemoval = true)
+	private static ItemMeta model(final ItemStack stack, final CustomItem customItem) {
+		final ItemMeta meta = stack.getItemMeta();
+		meta.setCustomModelData(customItem.getCustomModelData());
+		return meta;
+	}
 }

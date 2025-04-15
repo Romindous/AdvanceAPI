@@ -23,12 +23,12 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public class AdvancementPacketReceiver {
 	
-	private static HashMap<String, ChannelHandler> handlers = new HashMap<>();
+	private static final HashMap<String, ChannelHandler> handlers = new HashMap<>();
 	private static Field channelField;
 	private static Field networkManagerField;
 	
-	{
-		for(Field f : Connection.class.getDeclaredFields()) {
+	static {
+		for (Field f : Connection.class.getDeclaredFields()) {
 			if(f.getType().isAssignableFrom(Channel.class)) {
 				channelField = f;
 				channelField.setAccessible(true);
@@ -36,7 +36,7 @@ public class AdvancementPacketReceiver {
 			}
 		}
 		
-		for(Field f : ServerCommonPacketListenerImpl.class.getDeclaredFields()) {
+		for (Field f : ServerCommonPacketListenerImpl.class.getDeclaredFields()) {
 			if(f.getType().isAssignableFrom(Connection.class)) {
 				networkManagerField = f;
 				networkManagerField.setAccessible(true);
@@ -45,8 +45,8 @@ public class AdvancementPacketReceiver {
 		}
 	}
 	
-	interface PacketReceivingHandler {
-		public boolean handle(Player p, ServerboundSeenAdvancementsPacket packet);
+	public interface PacketReceivingHandler {
+		boolean handle(Player p, ServerboundSeenAdvancementsPacket packet);
 	}
 	
 	public ChannelHandler listen(final Player p, final PacketReceivingHandler handler) {
@@ -55,7 +55,7 @@ public class AdvancementPacketReceiver {
 		
 		ChannelHandler handle = new MessageToMessageDecoder<Packet<?>>() {
 			@Override
-			protected void decode(ChannelHandlerContext chc, Packet<?> packet, List<Object> out) throws Exception {
+			protected void decode(ChannelHandlerContext chc, Packet<?> packet, List<Object> out) {
 				
 				if(packet instanceof ServerboundSeenAdvancementsPacket) {
 					if(!handler.handle(p, (ServerboundSeenAdvancementsPacket) packet)) {
@@ -110,35 +110,31 @@ public class AdvancementPacketReceiver {
 	}
 	
 	public void initPlayer(Player p) {
-		handlers.put(p.getName(), listen(p, new PacketReceivingHandler() {
-			
-			@Override
-			public boolean handle(Player p, ServerboundSeenAdvancementsPacket packet) {
-				
-				if(packet.getAction() == ServerboundSeenAdvancementsPacket.Action.OPENED_TAB) {
-					NameKey name = new NameKey(packet.getTab());
-					AdvancementTabChangeEvent event = new AdvancementTabChangeEvent(p, name);
-					Bukkit.getPluginManager().callEvent(event);
-					
-					if(event.isCancelled()) {
-						CrazyAdvancementsAPI.clearActiveTab(p);
-						return false;
-					} else {
-						if(!event.getTabAdvancement().equals(name)) {
-							CrazyAdvancementsAPI.setActiveTab(p, event.getTabAdvancement());
-						} else {
-							CrazyAdvancementsAPI.setActiveTab(p, name, false);
-						}
-					}
-				} else {
-					AdvancementScreenCloseEvent event = new AdvancementScreenCloseEvent(p);
-					Bukkit.getPluginManager().callEvent(event);
-				}
-				
-				
-				return true;
-			}
-		}));
+		handlers.put(p.getName(), listen(p, (p1, packet) -> {
+
+            if(packet.getAction() == ServerboundSeenAdvancementsPacket.Action.OPENED_TAB) {
+                NameKey name = new NameKey(packet.getTab());
+                AdvancementTabChangeEvent event = new AdvancementTabChangeEvent(p1, name);
+                Bukkit.getPluginManager().callEvent(event);
+
+                if(event.isCancelled()) {
+                    CrazyAdvancementsAPI.clearActiveTab(p1);
+                    return false;
+                } else {
+                    if(!event.getTabAdvancement().equals(name)) {
+                        CrazyAdvancementsAPI.setActiveTab(p1, event.getTabAdvancement());
+                    } else {
+                        CrazyAdvancementsAPI.setActiveTab(p1, name, false);
+                    }
+                }
+            } else {
+                AdvancementScreenCloseEvent event = new AdvancementScreenCloseEvent(p1);
+                Bukkit.getPluginManager().callEvent(event);
+            }
+
+
+            return true;
+        }));
 	}
 	
 }

@@ -1,13 +1,14 @@
 package eu.endercentral.crazy_advancements.advancement;
 
+import javax.annotation.Nullable;
+import eu.endercentral.crazy_advancements.CrazyAdvancementsAPI;
 import eu.endercentral.crazy_advancements.JSONMessage;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.advancements.AdvancementType;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 /**
  * Represents the Display Information of an Advancement
@@ -18,13 +19,13 @@ import javax.annotation.Nullable;
 public class AdvancementDisplay {
 	
 	private ItemStack icon;
-	private JSONMessage title, description;
+	private Component title, description;
 	private AdvancementFrame frame;
 	private transient AdvancementVisibility vis;
 	private String backgroundTexture;
 	private float x = 0, y = 0;
 	private Advancement positionOrigin;
-	
+
 	//Material Constructors
 	
 	/**
@@ -33,18 +34,68 @@ public class AdvancementDisplay {
 	 * @param title Title {@link JSONMessage}
 	 * @param description Description {@link JSONMessage}
 	 * @param frame {@link AdvancementFrame}
+	 * @param backgroundTexture Background texture path
 	 * @param visibility When an advancement is visible
 	 */
+	@Deprecated
+	public AdvancementDisplay(Material icon, JSONMessage title, JSONMessage description, AdvancementFrame frame, String backgroundTexture, AdvancementVisibility visibility) {
+		this(new ItemStack(icon), title, description, frame, backgroundTexture, visibility);
+	}
+
+	/**
+	 *
+	 * @param icon Icon {@link Material}
+	 * @param title Title {@link JSONMessage}
+	 * @param description Description {@link JSONMessage}
+	 * @param frame {@link AdvancementFrame}
+	 * @param visibility When an advancement is visible
+	 */
+	@Deprecated
 	public AdvancementDisplay(Material icon, JSONMessage title, JSONMessage description, AdvancementFrame frame, AdvancementVisibility visibility) {
 		this.icon = new ItemStack(icon);
-		this.title = title;
-		this.description = description;
+		this.title = title.getAdventure();
+		this.description = description.getAdventure();
+//		GsonComponentSerializer.gson().deserialize(ComponentSerializer.toString(title.json()));
 		this.frame = frame;
-		setVisibility(visibility);
+		this.vis = visibility;
 	}
-	
+
 	/**
-	 * 
+	 *
+	 * @param icon Icon {@link ItemStack}
+	 * @param title Title {@link JSONMessage}
+	 * @param description Description {@link JSONMessage}
+	 * @param frame {@link AdvancementFrame}
+	 * @param backgroundTexture Background texture path
+	 * @param visibility When an advancement is visible
+	 */
+	@Deprecated
+	public AdvancementDisplay(ItemStack icon, JSONMessage title, JSONMessage description, AdvancementFrame frame, String backgroundTexture, AdvancementVisibility visibility) {
+		this.icon = icon;
+		this.title = title.getAdventure();
+		this.description = description.getAdventure();
+//		GsonComponentSerializer.gson().deserialize(ComponentSerializer.toString(title.json()));
+		this.frame = frame;
+		this.backgroundTexture = backgroundTexture;
+		this.vis = visibility;
+	}
+
+	/**
+	 *
+	 * @param icon Icon {@link Material}
+	 * @param title Title {@link String}
+	 * @param description Description {@link String}
+	 * @param frame {@link AdvancementFrame}
+	 * @param backgroundTexture Background texture path
+	 * @param visibility When an advancement is visible
+	 */
+	@Deprecated
+	public AdvancementDisplay(Material icon, String title, String description, AdvancementFrame frame, String backgroundTexture, AdvancementVisibility visibility) {
+		this(new ItemStack(icon), CrazyAdvancementsAPI.msg.deserialize(title), CrazyAdvancementsAPI.msg.deserialize(description), frame, backgroundTexture, visibility);
+	}
+
+	/**
+	 *
 	 * @param icon Icon {@link Material}
 	 * @param title Title {@link String}
 	 * @param description Description {@link String}
@@ -53,66 +104,11 @@ public class AdvancementDisplay {
 	 */
 	public AdvancementDisplay(Material icon, String title, String description, AdvancementFrame frame, AdvancementVisibility visibility) {
 		this.icon = new ItemStack(icon);
-		TextComponent titleComponent = new TextComponent(title);
-		this.title = new JSONMessage(titleComponent);
-		this.description = new JSONMessage(new TextComponent(description));
+		this.title = CrazyAdvancementsAPI.msg.deserialize(title);
+		this.description = CrazyAdvancementsAPI.msg.deserialize(description);
+//		GsonComponentSerializer.gson().deserialize(ComponentSerializer.toString(title.json()));
 		this.frame = frame;
-		setVisibility(visibility);
-	}
-	
-	/**
-	 * 
-	 * @param icon Icon {@link Material}
-	 * @param title Title {@link JSONMessage}
-	 * @param description Description {@link JSONMessage}
-	 * @param frame {@link AdvancementFrame}
-	 * @param backgroundTexture Background texture path
-	 * @param visibility When an advancement is visible
-	 */
-	public AdvancementDisplay(Material icon, JSONMessage title, JSONMessage description, AdvancementFrame frame, String backgroundTexture, AdvancementVisibility visibility) {
-		this.icon = new ItemStack(icon);
-		this.title = title;
-		this.description = description;
-		this.frame = frame;
-		this.backgroundTexture = backgroundTexture;
-		setVisibility(visibility);
-	}
-	
-	/**
-	 * 
-	 * @param icon Icon {@link Material}
-	 * @param title Title {@link String}
-	 * @param description Description {@link String}
-	 * @param frame {@link AdvancementFrame}
-	 * @param backgroundTexture Background texture path
-	 * @param visibility When an advancement is visible
-	 */
-	public AdvancementDisplay(Material icon, String title, String description, AdvancementFrame frame, String backgroundTexture, AdvancementVisibility visibility) {
-		this.icon = new ItemStack(icon);
-		TextComponent titleComponent = new TextComponent(title);
-		this.title = new JSONMessage(titleComponent);
-		this.description = new JSONMessage(new TextComponent(description));
-		this.frame = frame;
-		this.backgroundTexture = backgroundTexture;
-		setVisibility(visibility);
-	}
-	
-	//ItemStack constructors
-	
-	/**
-	 * 
-	 * @param icon Icon {@link ItemStack}
-	 * @param title Title {@link JSONMessage}
-	 * @param description Description {@link JSONMessage}
-	 * @param frame {@link AdvancementFrame}
-	 * @param visibility When an advancement is visible
-	 */
-	public AdvancementDisplay(ItemStack icon, JSONMessage title, JSONMessage description, AdvancementFrame frame, AdvancementVisibility visibility) {
-		this.icon = icon;
-		this.title = title;
-		this.description = description;
-		this.frame = frame;
-		setVisibility(visibility);
+		this.vis = visibility;
 	}
 	
 	/**
@@ -124,34 +120,11 @@ public class AdvancementDisplay {
 	 * @param visibility When an advancement is visible
 	 */
 	public AdvancementDisplay(ItemStack icon, String title, String description, AdvancementFrame frame, AdvancementVisibility visibility) {
-		this.icon = icon;
-		TextComponent titleComponent = new TextComponent(title);
-		this.title = new JSONMessage(titleComponent);
-		this.description = new JSONMessage(new TextComponent(description));
-		this.frame = frame;
-		setVisibility(visibility);
+		this(icon, CrazyAdvancementsAPI.msg.deserialize(title), CrazyAdvancementsAPI.msg.deserialize(description), frame, visibility);
 	}
-	
+
 	/**
-	 * 
-	 * @param icon Icon {@link ItemStack}
-	 * @param title Title {@link JSONMessage}
-	 * @param description Description {@link JSONMessage}
-	 * @param frame {@link AdvancementFrame}
-	 * @param backgroundTexture Background texture path
-	 * @param visibility When an advancement is visible
-	 */
-	public AdvancementDisplay(ItemStack icon, JSONMessage title, JSONMessage description, AdvancementFrame frame, String backgroundTexture, AdvancementVisibility visibility) {
-		this.icon = icon;
-		this.title = title;
-		this.description = description;
-		this.frame = frame;
-		this.backgroundTexture = backgroundTexture;
-		setVisibility(visibility);
-	}
-	
-	/**
-	 * 
+	 *
 	 * @param icon Icon {@link ItemStack}
 	 * @param title Title {@link String}
 	 * @param description Description {@link String}
@@ -160,13 +133,42 @@ public class AdvancementDisplay {
 	 * @param visibility When an advancement is visible
 	 */
 	public AdvancementDisplay(ItemStack icon, String title, String description, AdvancementFrame frame, String backgroundTexture, AdvancementVisibility visibility) {
+		this(icon, CrazyAdvancementsAPI.msg.deserialize(title), CrazyAdvancementsAPI.msg.deserialize(description), frame, backgroundTexture, visibility);
+	}
+
+	//ItemStack constructors
+
+	/**
+	 *
+	 * @param icon Icon {@link ItemStack}
+	 * @param title Title {@link Component}
+	 * @param description Description {@link Component}
+	 * @param frame {@link AdvancementFrame}
+	 * @param visibility When an advancement is visible
+	 */
+	public AdvancementDisplay(ItemStack icon, Component title, Component description, AdvancementFrame frame, AdvancementVisibility visibility) {
 		this.icon = icon;
-		TextComponent titleComponent = new TextComponent(title);
-		this.title = new JSONMessage(titleComponent);
-		this.description = new JSONMessage(new TextComponent(description));
+		this.title = title;
+		this.description = description;
+		this.frame = frame;
+		this.vis = visibility;
+	}
+
+	/**
+	 *
+	 * @param icon Icon {@link ItemStack}
+	 * @param title Title {@link Component}
+	 * @param description Description {@link Component}
+	 * @param frame {@link AdvancementFrame}
+	 * @param visibility When an advancement is visible
+	 */
+	public AdvancementDisplay(ItemStack icon, Component title, Component description, AdvancementFrame frame, String backgroundTexture, AdvancementVisibility visibility) {
+		this.icon = icon;
+		this.title = title;
+		this.description = description;
 		this.frame = frame;
 		this.backgroundTexture = backgroundTexture;
-		setVisibility(visibility);
+		this.vis = visibility;
 	}
 	
 	/**
@@ -175,7 +177,7 @@ public class AdvancementDisplay {
 	 * @author Axel
 	 *
 	 */
-	public static enum AdvancementFrame {
+	public enum AdvancementFrame {
 		
 		/**
 		 * A Task has the default Frame and defaults to a green Color in Completion Messages
@@ -191,9 +193,9 @@ public class AdvancementDisplay {
 		CHALLENGE(AdvancementType.CHALLENGE)
 		;
 		
-		private AdvancementType nms;
+		private final AdvancementType nms;
 		
-		private AdvancementFrame(AdvancementType nms) {
+		AdvancementFrame(AdvancementType nms) {
 			this.nms = nms;
 		}
 		
@@ -250,7 +252,16 @@ public class AdvancementDisplay {
 	 * 
 	 * @return Title {@link JSONMessage}
 	 */
+	@Deprecated
 	public JSONMessage getTitle() {
+		return new JSONMessage(new TextComponent(CrazyAdvancementsAPI.msg.serialize(title)));
+	}
+
+	/**
+	 *
+	 * @return Title {@link Component}
+	 */
+	public Component title() {
 		return title;
 	}
 	
@@ -258,7 +269,16 @@ public class AdvancementDisplay {
 	 * 
 	 * @return Description {@link JSONMessage}
 	 */
+	@Deprecated
 	public JSONMessage getDescription() {
+		return new JSONMessage(new TextComponent(CrazyAdvancementsAPI.msg.serialize(description)));
+	}
+
+	/**
+	 *
+	 * @return Title {@link Component}
+	 */
+	public Component description() {
 		return description;
 	}
 	
@@ -350,7 +370,7 @@ public class AdvancementDisplay {
 	public boolean isVisible(Player player, Advancement advancement) {
 		AdvancementVisibility visibility = getVisibility();
 		Advancement parent = advancement.getParent();
-		boolean parentVisible = parent == null ? true : parent.getDisplay().isVisible(player, parent);
+		boolean parentVisible = parent == null || parent.getDisplay().isVisible(player, parent);
 		return parentVisible && visibility.isVisible(player, advancement) || advancement.isGranted(player) || (visibility.isAlwaysVisibleWhenAnyChildIsGranted() && advancement.isAnythingGrantedAfter(player));
 	}
 	
@@ -389,8 +409,9 @@ public class AdvancementDisplay {
 	 * 
 	 * @param title New title {@link JSONMessage}
 	 */
+	@Deprecated
 	public void setTitle(JSONMessage title) {
-		this.title = title;
+		this.title = title.getAdventure();
 	}
 	
 	/**
@@ -398,9 +419,27 @@ public class AdvancementDisplay {
 	 * 
 	 * @param title New Title {@link String}
 	 */
+	@Deprecated
 	public void setTitle(String title) {
-		TextComponent titleComponent = new TextComponent(title);
-		this.title = new JSONMessage(titleComponent);
+		this.title = CrazyAdvancementsAPI.msg.deserialize(title);
+	}
+
+	/**
+	 * Changes the Title
+	 *
+	 * @param title New Title {@link String}
+	 */
+	public void title(String title) {
+		this.title = CrazyAdvancementsAPI.msg.deserialize(title);
+	}
+
+	/**
+	 * Changes the Title
+	 *
+	 * @param title New Title {@link Component}
+	 */
+	public void title(Component title) {
+		this.title = title;
 	}
 	
 	/**
@@ -408,8 +447,9 @@ public class AdvancementDisplay {
 	 * 
 	 * @param description New description {@link JSONMessage}
 	 */
+	@Deprecated
 	public void setDescription(JSONMessage description) {
-		this.description = description;
+		this.description = description.getAdventure();
 	}
 	
 	/**
@@ -417,8 +457,27 @@ public class AdvancementDisplay {
 	 * 
 	 * @param description New Description {@link String}
 	 */
+	@Deprecated
 	public void setDescription(String description) {
-		this.description = new JSONMessage(new TextComponent(description));
+		this.description = CrazyAdvancementsAPI.msg.deserialize(description);
+	}
+
+	/**
+	 * Changes the Description
+	 *
+	 * @param description New Description {@link String}
+	 */
+	public void description(String description) {
+		this.title = CrazyAdvancementsAPI.msg.deserialize(description);
+	}
+
+	/**
+	 * Changes the Description
+	 *
+	 * @param description New Description {@link Component}
+	 */
+	public void description(Component description) {
+		this.title = description;
 	}
 	
 	/**

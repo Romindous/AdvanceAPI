@@ -7,6 +7,7 @@ import eu.endercentral.crazy_advancements.advancement.AdvancementDisplay.Advance
 import eu.endercentral.crazy_advancements.advancement.criteria.Criteria;
 import eu.endercentral.crazy_advancements.advancement.progress.AdvancementProgress;
 import eu.endercentral.crazy_advancements.packet.ToastPacket;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -29,7 +30,7 @@ public class ToastNotification {
 	}
 	
 	private final ItemStack icon;
-	private final JSONMessage message;
+	private final Component message;
 	private final AdvancementFrame frame;
 	
 	/**
@@ -39,9 +40,38 @@ public class ToastNotification {
 	 * @param message The displayed Message
 	 * @param frame Determines the displayed Title and Sound Effect (evaluated client-side and modifiable via resource packs)
 	 */
+	@Deprecated
 	public ToastNotification(ItemStack icon, JSONMessage message, AdvancementFrame frame) {
 		this.icon = icon;
-		this.message = message;
+		this.message = message.getAdventure();
+		this.frame = frame;
+	}
+
+	/**
+	 * Constructor for creating Toast Notifications
+	 *
+	 * @param icon The displayed Icon
+	 * @param message The displayed Message
+	 * @param frame Determines the displayed Title and Sound Effect (evaluated client-side and modifiable via resource packs)
+	 */
+	@Deprecated
+	public ToastNotification(Material icon, JSONMessage message, AdvancementFrame frame) {
+		this.icon = new ItemStack(icon);
+		this.message = message.getAdventure();
+		this.frame = frame;
+	}
+
+	/**
+	 * Constructor for creating Toast Notifications
+	 *
+	 * @param icon The displayed Icon
+	 * @param message The displayed Message
+	 * @param frame Determines the displayed Title and Sound Effect (evaluated client-side and modifiable via resource packs)
+	 */
+	@Deprecated
+	public ToastNotification(Material icon, String message, AdvancementFrame frame) {
+		this.icon = new ItemStack(icon);
+		this.message = CrazyAdvancementsAPI.msg.deserialize(message);
 		this.frame = frame;
 	}
 	
@@ -54,33 +84,20 @@ public class ToastNotification {
 	 */
 	public ToastNotification(ItemStack icon, String message, AdvancementFrame frame) {
 		this.icon = icon;
-		this.message = new JSONMessage(new TextComponent(message));
+		this.message = CrazyAdvancementsAPI.msg.deserialize(message);
 		this.frame = frame;
 	}
-	
+
 	/**
 	 * Constructor for creating Toast Notifications
-	 * 
+	 *
 	 * @param icon The displayed Icon
 	 * @param message The displayed Message
 	 * @param frame Determines the displayed Title and Sound Effect (evaluated client-side and modifiable via resource packs)
 	 */
-	public ToastNotification(Material icon, JSONMessage message, AdvancementFrame frame) {
-		this.icon = new ItemStack(icon);
+	public ToastNotification(ItemStack icon, Component message, AdvancementFrame frame) {
+		this.icon = icon;
 		this.message = message;
-		this.frame = frame;
-	}
-	
-	/**
-	 * Constructor for creating Toast Notifications
-	 * 
-	 * @param icon The displayed Icon
-	 * @param message The displayed Message
-	 * @param frame Determines the displayed Title and Sound Effect (evaluated client-side and modifiable via resource packs)
-	 */
-	public ToastNotification(Material icon, String message, AdvancementFrame frame) {
-		this.icon = new ItemStack(icon);
-		this.message = new JSONMessage(new TextComponent(message));
 		this.frame = frame;
 	}
 	
@@ -94,11 +111,21 @@ public class ToastNotification {
 	}
 	
 	/**
-	 * Gets the TItle
+	 * Gets the Title
 	 * 
 	 * @return The Title
 	 */
+	@Deprecated
 	public JSONMessage getMessage() {
+		return new JSONMessage(new TextComponent(CrazyAdvancementsAPI.msg.serialize(message)));
+	}
+
+	/**
+	 * Gets the Title
+	 *
+	 * @return The Title
+	 */
+	public Component message() {
 		return message;
 	}
 	
