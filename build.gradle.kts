@@ -1,4 +1,3 @@
-import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
@@ -28,10 +27,6 @@ java {
 }
 
 tasks {
-    build {
-        paperweight.reobfArtifactConfiguration = ReobfArtifactConfiguration.MOJANG_PRODUCTION
-    }
-
     compileJava {
         options.encoding = Charsets.UTF_8.name()
         options.release.set(21)

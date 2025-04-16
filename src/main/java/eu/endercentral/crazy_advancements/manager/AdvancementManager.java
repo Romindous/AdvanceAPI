@@ -394,22 +394,14 @@ public final class AdvancementManager {
 	 * @param player The target Player
 	 */
 	public void updateVisibility(Player player) {
-		for(Advancement advancement : getAdvancements()) {
-			boolean visibleBefore = advancement.getVisibilityStatus(player);
-			boolean visible = advancement.getDisplay().isVisible(player, advancement);
-			
-			if(visibleBefore != visible) {
-				advancement.saveVisibilityStatus(player, visible);
-				
-				if(visible) {
-					AdvancementsPacket packet = new AdvancementsPacket(player, false, Arrays.asList(advancement), null);
-					packet.send();
-				} else {
-					AdvancementsPacket packet = new AdvancementsPacket(player, false, null, Arrays.asList(advancement.getName()));
-					packet.send();
-				}
-			}
-		}
+		for (Advancement advancement : getAdvancements()) {
+            boolean visible = advancement.getDisplay().isVisible(player, advancement);
+            if (advancement.getVisibilityStatus(player) == visible) continue;
+            advancement.saveVisibilityStatus(player, visible);
+
+            (visible ? new AdvancementsPacket(player, false, Arrays.asList(advancement), null)
+                : new AdvancementsPacket(player, false, null, Arrays.asList(advancement.getName()))).send();
+        }
 	}
 	
 	/**

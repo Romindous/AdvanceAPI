@@ -144,11 +144,8 @@ public class ToastNotification {
 	 * @param player The target Player
 	 */
 	public void send(Player player) {
-		ToastPacket addPacket = new ToastPacket(player, true, this);
-		ToastPacket removePacket = new ToastPacket(player, false, this);
-		
-		addPacket.send();
-		removePacket.send();
+        new ToastPacket(player, true, this).send();
+		new ToastPacket(player, false, this).send();
 	}
 	
 }

@@ -10,6 +10,7 @@ import eu.endercentral.crazy_advancements.advancement.AdvancementFlag;
 import eu.endercentral.crazy_advancements.advancement.ToastNotification;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.ShadowColor;
 import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.DisplayInfo;
@@ -57,22 +58,23 @@ public class PacketConverter {
 	 * @return The NMS Advancement
 	 */
 	public static net.minecraft.advancements.Advancement toNmsAdvancement(Advancement advancement) {
-		AdvancementDisplay display = advancement.getDisplay();
+		final AdvancementDisplay display = advancement.getDisplay();
 		
-		ItemStack icon = CraftItemStack.asNMSCopy(display.getIcon());
+		final ItemStack icon = CraftItemStack.asNMSCopy(display.getIcon());
 
-        Optional<ClientAsset> backgroundTexture = display.getBackgroundTexture() == null ? Optional.empty()
+        final Optional<ClientAsset> backgroundTexture = display.getBackgroundTexture() == null ? Optional.empty()
 			: Optional.of(new ClientAsset(ResourceLocation.parse(display.getBackgroundTexture())));
+
+		final Optional<ResourceLocation> parent = advancement.isRoot() ? Optional.empty()
+			: Optional.of(advancement.getParent().getName().getMinecraftKey());
 		
 		float x = generateX(advancement.getTab(), display.generateX());
 		float y = generateY(advancement.getTab(), display.generateY());
 		
-		final DisplayInfo advDisplay = new DisplayInfo(icon, PaperAdventure.asVanilla(display.title()), PaperAdventure.asVanilla(display.description()),
-			backgroundTexture, display.getFrame().getNMS(), false, false, advancement.hasFlag(AdvancementFlag.SEND_WITH_HIDDEN_BOOLEAN));
+		final DisplayInfo advDisplay = new DisplayInfo(icon, PaperAdventure.asVanilla(advancement.isRoot() ? display.title().shadowColor(ShadowColor
+			.shadowColor(0, 0, 0, 255)) : display.title()), PaperAdventure.asVanilla(display.description()), backgroundTexture,
+			display.getFrame().getNMS(), false, false, advancement.hasFlag(AdvancementFlag.SEND_WITH_HIDDEN_BOOLEAN));
 		advDisplay.setLocation(x, y);
-		
-		Optional<ResourceLocation> parent = advancement.getParent() == null
-			? Optional.empty() : Optional.of(advancement.getParent().getName().getMinecraftKey());
 
         return new net.minecraft.advancements.Advancement(parent, Optional.of(advDisplay), advancementRewards,
 			advancement.getCriteria().getCriteria(), advancement.getCriteria().getAdvancementRequirements(), false);
