@@ -62,8 +62,9 @@ public class PacketConverter {
 		
 		final ItemStack icon = CraftItemStack.asNMSCopy(display.getIcon());
 
-        final Optional<ClientAsset> backgroundTexture = display.getBackgroundTexture() == null ? Optional.empty()
-			: Optional.of(new ClientAsset(ResourceLocation.parse(display.getBackgroundTexture())));
+		final NameKey back = display.background();
+		final Optional<ClientAsset> backgroundTexture = back == null
+			? Optional.empty() : Optional.of(new ClientAsset(back.getMinecraftKey()));
 
 		final Optional<ResourceLocation> parent = advancement.isRoot() ? Optional.empty()
 			: Optional.of(advancement.getParent().getName().getMinecraftKey());

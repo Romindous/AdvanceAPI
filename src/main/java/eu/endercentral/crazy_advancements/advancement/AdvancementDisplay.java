@@ -3,6 +3,7 @@ package eu.endercentral.crazy_advancements.advancement;
 import javax.annotation.Nullable;
 import eu.endercentral.crazy_advancements.CrazyAdvancementsAPI;
 import eu.endercentral.crazy_advancements.JSONMessage;
+import eu.endercentral.crazy_advancements.NameKey;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.advancements.AdvancementType;
@@ -22,7 +23,7 @@ public class AdvancementDisplay {
 	private Component title, description;
 	private AdvancementFrame frame;
 	private transient AdvancementVisibility vis;
-	private String backgroundTexture;
+	private NameKey backgroundTexture;
 	private float x = 0, y = 0;
 	private Advancement positionOrigin;
 
@@ -76,7 +77,7 @@ public class AdvancementDisplay {
 		this.description = description.getAdventure();
 //		GsonComponentSerializer.gson().deserialize(ComponentSerializer.toString(title.json()));
 		this.frame = frame;
-		this.backgroundTexture = backgroundTexture;
+		this.backgroundTexture = new NameKey(backgroundTexture);
 		this.vis = visibility;
 	}
 
@@ -163,6 +164,23 @@ public class AdvancementDisplay {
 	 * @param visibility When an advancement is visible
 	 */
 	public AdvancementDisplay(ItemStack icon, Component title, Component description, AdvancementFrame frame, String backgroundTexture, AdvancementVisibility visibility) {
+		this.icon = icon;
+		this.title = title;
+		this.description = description;
+		this.frame = frame;
+		this.backgroundTexture = new NameKey(backgroundTexture);
+		this.vis = visibility;
+	}
+
+	/**
+	 *
+	 * @param icon Icon {@link ItemStack}
+	 * @param title Title {@link Component}
+	 * @param description Description {@link Component}
+	 * @param frame {@link AdvancementFrame}
+	 * @param visibility When an advancement is visible
+	 */
+	public AdvancementDisplay(ItemStack icon, Component title, Component description, AdvancementFrame frame, NameKey backgroundTexture, AdvancementVisibility visibility) {
 		this.icon = icon;
 		this.title = title;
 		this.description = description;
@@ -296,6 +314,15 @@ public class AdvancementDisplay {
 	 */
 	@Nullable
 	public String getBackgroundTexture() {
+		return backgroundTexture == null ? null : backgroundTexture.toString();
+	}
+
+	/**
+	 *
+	 * @return Background texture path
+	 */
+	@Nullable
+	public NameKey background() {
 		return backgroundTexture;
 	}
 	
@@ -304,8 +331,18 @@ public class AdvancementDisplay {
 	 * 
 	 * @param backgroundTexture Background Texture path
 	 */
+	@Deprecated
 	public void setBackgroundTexture(@Nullable String backgroundTexture) {
-		this.backgroundTexture = backgroundTexture;
+		this.backgroundTexture = backgroundTexture == null ? null : new NameKey(backgroundTexture);
+	}
+
+	/**
+	 * Sets the background texture
+	 *
+	 * @param background Background Texture path
+	 */
+	public void background(@Nullable NameKey background) {
+		this.backgroundTexture = background;
 	}
 	
 	/**
