@@ -101,8 +101,14 @@ public class SerializedMessage {
 		}
 
 		if (getClickEvent() != null) {
-			message = message.clickEvent(net.kyori.adventure.text.event.ClickEvent.clickEvent(net.kyori.adventure.text.event.ClickEvent.Action
-				.valueOf(getClickEvent().getAction().toUpperCase(Locale.ROOT)), getClickEvent().getValue()));
+			switch (net.kyori.adventure.text.event.ClickEvent.Action
+				.valueOf(getClickEvent().getAction().toUpperCase(Locale.ROOT))) {
+                case OPEN_URL -> net.kyori.adventure.text.event.ClickEvent.openUrl(getClickEvent().getValue());
+                case OPEN_FILE -> net.kyori.adventure.text.event.ClickEvent.openFile(getClickEvent().getValue());
+                case RUN_COMMAND -> net.kyori.adventure.text.event.ClickEvent.runCommand(getClickEvent().getValue());
+                case SUGGEST_COMMAND -> net.kyori.adventure.text.event.ClickEvent.suggestCommand(getClickEvent().getValue());
+                case COPY_TO_CLIPBOARD -> net.kyori.adventure.text.event.ClickEvent.copyToClipboard(getClickEvent().getValue());
+            }
 		}
 
 		if (getExtra() != null) {
