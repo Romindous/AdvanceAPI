@@ -196,7 +196,7 @@ public class CrazyAdvancementsAPI extends JavaPlugin implements Listener {
 					AdvancementDisplay display = new AdvancementDisplay(icon, title, description, frame, visibility);
 					
 					if(serializedAdvancementDisplay.getBackgroundTexture() != null) {
-						display.setBackgroundTexture(serializedAdvancementDisplay.getBackgroundTexture());
+						display.background(new NameKey(serializedAdvancementDisplay.getBackgroundTexture()));
 					}
 					
 					display.setX(serializedAdvancementDisplay.getX());
