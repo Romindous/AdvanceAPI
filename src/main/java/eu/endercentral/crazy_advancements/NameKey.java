@@ -94,7 +94,7 @@ public class NameKey {
 	
 	@Override
 	public boolean equals(Object obj) {
-		return isSimilar((NameKey) obj);
+		return obj instanceof final NameKey nk && isSimilar(nk);
 	}
 	
 	@Override

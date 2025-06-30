@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "eu.endercentral.crazy_advancements"
-version = "2.21.5"
+version = "2.21.7"
 
 repositories {
     mavenCentral()
@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.21.6-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.7-R0.1-SNAPSHOT")
 }
 
 java {
@@ -52,7 +52,7 @@ publishing {
 bukkit {
     main = "eu.endercentral.crazy_advancements.CrazyAdvancementsAPI"
     author = "ZockerAxel"
-    apiVersion = "1.21.5" // Should be always same as dev bundle version
+    apiVersion = "1.21.7" // Should be always same as dev bundle version
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
 
     commands {
