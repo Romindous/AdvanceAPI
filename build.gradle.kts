@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "eu.endercentral.crazy_advancements"
-version = "2.21.7"
+version = "2.21.8"
 
 repositories {
     mavenCentral()
