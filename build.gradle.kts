@@ -3,7 +3,7 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 plugins {
     id("java")
     id("maven-publish")
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.17"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.18"
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
 }
 
@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.21.7-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
 }
 
 java {
@@ -52,7 +52,7 @@ publishing {
 bukkit {
     main = "eu.endercentral.crazy_advancements.CrazyAdvancementsAPI"
     author = "ZockerAxel"
-    apiVersion = "1.21.7" // Should be always same as dev bundle version
+    apiVersion = "1.21.8" // Should be always same as dev bundle version
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
 
     commands {
