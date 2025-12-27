@@ -14,7 +14,7 @@ import eu.endercentral.crazy_advancements.advancement.ToastNotification;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.network.protocol.game.ClientboundUpdateAdvancementsPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Represents an Advancements Packet for Toast Notifications
@@ -71,8 +71,8 @@ public record ToastPacket(Player player, boolean add, ToastNotification notifica
 	public ClientboundUpdateAdvancementsPacket build() {
 		//Create Lists
 		List<AdvancementHolder> advancements = new ArrayList<>();
-		Set<ResourceLocation> removedAdvancements = new HashSet<>();
-		Map<ResourceLocation, AdvancementProgress> progress = new HashMap<>();
+		Set<Identifier> removedAdvancements = new HashSet<>();
+		Map<Identifier, AdvancementProgress> progress = new HashMap<>();
 
 		//Populate Lists
 		if (add) {

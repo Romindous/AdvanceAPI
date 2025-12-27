@@ -21,7 +21,7 @@ import eu.endercentral.crazy_advancements.packet.AdvancementsPacket;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.critereon.ImpossibleTrigger;
+import net.minecraft.advancements.criterion.ImpossibleTrigger;
 import net.minecraft.network.protocol.game.ClientboundSelectAdvancementsTabPacket;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

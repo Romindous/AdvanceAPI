@@ -15,7 +15,7 @@ import eu.endercentral.crazy_advancements.advancement.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.network.protocol.game.ClientboundUpdateAdvancementsPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Represents an Advancements Packet
@@ -89,8 +89,8 @@ public class AdvancementsPacket {
 	public ClientboundUpdateAdvancementsPacket build() {
 		//Create Lists
 		List<net.minecraft.advancements.AdvancementHolder> advancements = new ArrayList<>();
-		Set<ResourceLocation> removedAdvancements = new HashSet<>();
-		Map<ResourceLocation, AdvancementProgress> progress = new HashMap<>();
+		Set<Identifier> removedAdvancements = new HashSet<>();
+		Map<Identifier, AdvancementProgress> progress = new HashMap<>();
 		
 		//Populate Lists
 		for(Advancement advancement : this.advancements) {

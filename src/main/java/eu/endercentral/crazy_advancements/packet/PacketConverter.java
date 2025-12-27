@@ -15,7 +15,7 @@ import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.core.ClientAsset;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 
@@ -66,7 +66,7 @@ public class PacketConverter {
 		final Optional<ClientAsset.ResourceTexture> backgroundTexture = back == null
 			? Optional.empty() : Optional.of(new ClientAsset.ResourceTexture(back.getMinecraftKey()));
 
-		final Optional<ResourceLocation> parent = advancement.isRoot() ? Optional.empty()
+		final Optional<Identifier> parent = advancement.isRoot() ? Optional.empty()
 			: Optional.of(advancement.getParent().getName().getMinecraftKey());
 		
 		float x = generateX(advancement.getTab(), display.generateX());
