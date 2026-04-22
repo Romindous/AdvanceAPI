@@ -1,0 +1,32 @@
+name: CrazyAdvancementsAPI
+version: 2.21.11
+main: eu.endercentral.crazy_advancements.CrazyAdvancementsAPI
+load: STARTUP
+author: ZockerAxel,Romindous
+commands:
+  careload:
+    description: "Reloads the Crazy Advancements API. Valid categories are all, advancements,\
+      \ items"
+    usage: "/careload [Category]"
+  grant:
+    description: "Grants <Advancement>-[Criteria...] to <Player> in <Manager>"
+    aliases:
+      - cagrant
+    usage: "/grant <Player> <Manager> <Advancement> [Criteria...]"
+  revoke:
+    description: "Revokes <Advancement>-[Criteria...] to <Player> in <Manager>"
+    aliases:
+      - carevoke
+    usage: "/revoke <Player> <Manager> <Advancement> [Criteria...]"
+  setprogress:
+    description: "Sets <Advancement> Progress for <Player> in <Manager> using [Operation]"
+    aliases:
+      - caprogress
+    usage: "/setprogress <Player> <Manager> <Advancement> <Number> [Operation]"
+  showtoast:
+    description: "Displays a Toast Advancement Message"
+    aliases:
+      - catoast
+      - toast
+    usage: "/showtoast <Player> <Icon> [Frame] <Message>"
+api-version: 1.21.11

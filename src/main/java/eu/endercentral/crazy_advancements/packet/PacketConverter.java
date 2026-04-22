@@ -17,6 +17,7 @@ import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 
 public class PacketConverter {
@@ -72,7 +73,7 @@ public class PacketConverter {
 		float x = generateX(advancement.getTab(), display.generateX());
 		float y = generateY(advancement.getTab(), display.generateY());
 		
-		final DisplayInfo advDisplay = new DisplayInfo(icon, PaperAdventure.asVanilla(advancement.isRoot() ? display.title().shadowColor(ShadowColor
+		final DisplayInfo advDisplay = new DisplayInfo(ItemStackTemplate.fromNonEmptyStack(icon), PaperAdventure.asVanilla(advancement.isRoot() ? display.title().shadowColor(ShadowColor
 			.shadowColor(0, 0, 0, 255)) : display.title()), PaperAdventure.asVanilla(display.description()), backgroundTexture,
 			display.getFrame().getNMS(), false, false, advancement.hasFlag(AdvancementFlag.SEND_WITH_HIDDEN_BOOLEAN));
 		advDisplay.setLocation(x, y);
@@ -90,7 +91,7 @@ public class PacketConverter {
 	public static net.minecraft.advancements.Advancement toNmsToastAdvancement(ToastNotification notification) {
 		ItemStack icon = CraftItemStack.asNMSCopy(notification.getIcon());
 		
-		DisplayInfo advDisplay = new DisplayInfo(icon, PaperAdventure.asVanilla(notification.message()), PaperAdventure.asVanilla(Component.text("Toast Notification")),
+		DisplayInfo advDisplay = new DisplayInfo(ItemStackTemplate.fromNonEmptyStack(icon), PaperAdventure.asVanilla(notification.message()), PaperAdventure.asVanilla(Component.text("Toast Notification")),
 			Optional.empty(), notification.getFrame().getNMS(), true, false, true);
 
         return new net.minecraft.advancements.Advancement(Optional.empty(), Optional.of(advDisplay), advancementRewards,

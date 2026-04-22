@@ -1,14 +1,11 @@
-import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
-
 plugins {
     id("java")
     id("maven-publish")
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
-    id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
 }
 
 group = "eu.endercentral.crazy_advancements"
-version = "2.21.11"
+version = "2.26.12"
 
 repositories {
     mavenCentral()
@@ -18,18 +15,29 @@ repositories {
     }
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir("src/")
+        }
+        resources {
+            srcDir("resources/")
+        }
+    }
+}
+
 dependencies {
-    paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("26.1.2.build.9-alpha")
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 tasks {
     compileJava {
         options.encoding = Charsets.UTF_8.name()
-        options.release.set(21)
+        options.release.set(25)
         dependsOn(clean)
     }
 
@@ -45,44 +53,6 @@ publishing {
         create<MavenPublication>("maven") {
             artifact(tasks.reobfJar)
             artifact(tasks.jar).classifier = "mojmap"
-        }
-    }
-}
-
-bukkit {
-    main = "eu.endercentral.crazy_advancements.CrazyAdvancementsAPI"
-    author = "ZockerAxel"
-    apiVersion = "1.21.11" // Should be always same as dev bundle version
-    load = BukkitPluginDescription.PluginLoadOrder.STARTUP
-
-    commands {
-        register("grant") {
-            usage = "/grant <Player> <Manager> <Advancement> [Criteria...]"
-            description = "Grants <Advancement>-[Criteria...] to <Player> in <Manager>"
-            aliases = listOf("cagrant")
-        }
-
-        register("revoke") {
-            usage = "/revoke <Player> <Manager> <Advancement> [Criteria...]"
-            description = "Revokes <Advancement>-[Criteria...] to <Player> in <Manager>"
-            aliases = listOf("carevoke")
-        }
-
-        register("setprogress") {
-            usage = "/setprogress <Player> <Manager> <Advancement> <Number> [Operation]"
-            description = "Sets <Advancement> Progress for <Player> in <Manager> using [Operation]"
-            aliases = listOf("caprogress")
-        }
-
-        register("showtoast") {
-            usage = "/showtoast <Player> <Icon> [Frame] <Message>"
-            description = "Displays a Toast Advancement Message"
-            aliases = listOf("catoast", "toast")
-        }
-
-        register("careload") {
-            usage = "/careload [Category]"
-            description = "Reloads the Crazy Advancements API. Valid categories are all, advancements, items"
         }
     }
 }
